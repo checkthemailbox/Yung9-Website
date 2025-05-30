@@ -1,0 +1,11 @@
+{
+  "name": "yung9-website",
+  "version": "1.0.0",
+  "description": "Explore tracks from Yung9",
+  "scripts": {
+    "build": "esbuild ./index.tsx --bundle --outfile=./index.js --jsx=automatic --format=esm --external:react --external:react-dom/client"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.0"
+  }
+}

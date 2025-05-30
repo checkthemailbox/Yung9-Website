@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yung9 WEBSITE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif; /* Updated default font */
+      scroll-behavior: smooth; /* Added for smooth lyric scrolling */
+    }
+     /* Custom scrollbar for elements with .styled-scrollbar */
+    .styled-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .styled-scrollbar::-webkit-scrollbar-track {
+      background: rgba(50, 50, 50, 0.3); /* Semi-transparent track */
+      border-radius: 3px;
+    }
+    .styled-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(120, 120, 120, 0.7); /* Semi-transparent thumb */
+      border-radius: 3px;
+    }
+    .styled-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(150, 150, 150, 0.9);
+    }
+
+    /* Fallback for general scrollbar if needed, or remove if .styled-scrollbar is sufficient */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1a1a1a; 
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #4a4a4a; 
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #6a6a6a;
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.1.0",
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-neutral-950">
+  <div id="root"></div>
+  <script type="module" src="/index.js"></script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
