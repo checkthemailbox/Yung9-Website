@@ -5,11 +5,11 @@
   "scripts": {
     "build": "esbuild ./index.tsx --bundle --outfile=./index.js --jsx=automatic --format=esm --external:react --external:react-dom/client"
   },
-  "devDependencies": {
-    "esbuild": "^0.21.0"
-  },
   "dependencies": {
-    "react-helmet": "^6.1.0",
-    "sass": "^1.89.1"
+    "react-helmet": "^6.1.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.0",
+    "@types/react-helmet": "^6.1.11"
   }
 }
