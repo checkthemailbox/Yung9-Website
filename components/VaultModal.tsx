@@ -9,6 +9,7 @@ interface VaultModalProps {
 const VaultModal: React.FC<VaultModalProps> = ({ onClose, onUnlock }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isMounted, setIsMounted] = useState(false); // For entrance animation
   const modalRef = useRef<HTMLDivElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
 
@@ -25,6 +26,7 @@ const VaultModal: React.FC<VaultModalProps> = ({ onClose, onUnlock }) => {
   };
 
   useEffect(() => {
+    setIsMounted(true); // Trigger animation
     passwordInputRef.current?.focus();
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -53,14 +55,19 @@ const VaultModal: React.FC<VaultModalProps> = ({ onClose, onUnlock }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-[60] bg-black bg-opacity-75 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[60] bg-black bg-opacity-75 flex items-center justify-center p-4 transition-opacity duration-300 ease-out"
       role="dialog"
       aria-modal="true"
       aria-labelledby="vault-modal-title"
+      style={{ opacity: isMounted ? 1 : 0 }}
     >
       <div 
         ref={modalRef}
-        className="bg-neutral-800 p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-md text-white border border-neutral-700"
+        className={`
+          bg-neutral-800 p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-md text-white border border-neutral-700
+          transition-all duration-300 ease-out motion-safe:transform motion-reduce:transition-none
+          ${isMounted ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}
+        `}
       >
         <h2 id="vault-modal-title" className="text-2xl sm:text-3xl font-bold text-red-400 mb-6 text-center [text-shadow:0_0_6px_rgba(248,113,113,0.6)]">
           Enter The Vault

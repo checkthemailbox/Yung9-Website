@@ -95,12 +95,12 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPl
                  if (audio.duration !== Infinity && audio.duration > 0) {
                      setDuration(audio.duration);
                  }
-             }, 500); // Delay check for browsers that take time to report duration
+             }, 500); 
         }
     }
     
     const onTimeUpdateInternal = () => {
-      if (audio && !audio.paused) { // only update if playing
+      if (audio && !audio.paused) { 
         setCurrentTime(audio.currentTime);
       }
     };
@@ -113,15 +113,14 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPl
     audio.addEventListener('error', handleAudioError);
     audio.preload = 'metadata';
     
-    setDuration(0); // Reset duration on src change
-    setCurrentTime(0); // Reset current time on src change
-    setIsPlaying(false); // Reset playing state on src change
+    setDuration(0); 
+    setCurrentTime(0); 
+    setIsPlaying(false); 
    
-    // Ensure audio source is updated if it changes
     if (audio.currentSrc !== song.audioSnippetUrl || audio.src !== song.audioSnippetUrl) { 
         audio.src = song.audioSnippetUrl; 
-        audio.load(); // Important: call load() after changing src
-    } else if (audio.readyState === 0) { // If src is same but not loaded (e.g. network error previously)
+        audio.load(); 
+    } else if (audio.readyState === 0) { 
         audio.load();
     }
 
@@ -133,13 +132,12 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPl
       audio.removeEventListener('pause', handleAudioPause);
       audio.removeEventListener('ended', handleAudioEnded);
       audio.removeEventListener('error', handleAudioError);
-      if (audio && !audio.paused) { // Cleanup: pause audio if component unmounts while playing
+      if (audio && !audio.paused) { 
         audio.pause();
       }
     };
   }, [song.audioSnippetUrl, song.title, handleAudioPlay, handleAudioPause, handleAudioEnded, handleAudioError]);
 
-  // Effect to pause this card's audio if another card starts playing
   useEffect(() => {
     const audio = audioRef.current;
     if (audio && currentlyPlayingId && currentlyPlayingId !== song.id && !audio.paused) {
@@ -155,7 +153,6 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPl
     if (audio.paused) {
       audio.play().catch(error => {
         console.error(`[VinylSongCard - ${song.title}] Error playing audio:`, error);
-        // setIsPlaying(false); // Error handler and pause event will manage state
       });
     } else { 
       audio.pause();
@@ -198,7 +195,7 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPl
 
   return (
     <div
-      className="group relative flex flex-col items-center p-4 bg-neutral-900 rounded-xl shadow-lg transition-all duration-300 ease-in-out hover:shadow-purple-500/30 hover:shadow-2xl hover:scale-105"
+      className="group relative flex flex-col items-center p-4 bg-neutral-900 rounded-xl shadow-lg transition-all duration-300 ease-in-out hover:shadow-purple-500/30 hover:shadow-2xl motion-safe:hover:scale-105 motion-reduce:hover:scale-100"
       onMouseEnter={() => setIsPanelVisible(true)}
       onMouseLeave={() => setIsPanelVisible(false)}
       onFocusCapture={() => setIsPanelVisible(true)} 
@@ -213,18 +210,27 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPl
       aria-expanded={isPanelVisible}
       aria-label={`Song card for ${song.title}. Press space or enter to toggle player controls.`}
     >
-      <div className={`relative w-44 h-44 sm:w-48 sm:h-48 md:w-52 md:h-52 mb-5 overflow-hidden rounded-md bg-neutral-800 shadow-inner transition-opacity duration-300 ${isPanelVisible ? 'opacity-70' : 'opacity-100'}`}>
+      <div 
+        className={`
+          relative w-44 h-44 sm:w-48 sm:h-48 md:w-52 md:h-52 mb-5 overflow-hidden rounded-md 
+          bg-neutral-800 shadow-inner 
+          transition-all duration-300 ease-out
+          motion-safe:group-hover:scale-105 motion-safe:group-hover:shadow-xl motion-safe:group-hover:-translate-y-1
+          motion-reduce:group-hover:transform-none
+          ${isPanelVisible ? 'opacity-70 motion-safe:group-hover:blur-[2px]' : 'opacity-100'}
+        `}
+      >
         <img
           src={song.albumArtUrl}
           alt={`${song.title} Album Sleeve`}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 group-focus:scale-105"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 motion-safe:group-hover:scale-105 motion-reduce:group-hover:scale-100"
           loading="lazy"
         />
         <div
           className={`
             absolute top-[2.5%] left-[2.5%] w-[95%] h-[95%] bg-black rounded-full
             flex items-center justify-center origin-center
-            ${isPlaying ? 'animate-spin' : ''} shadow-xl 
+            ${isPlaying ? 'motion-safe:animate-spin' : ''} shadow-xl 
           `}
           style={{ animationDuration: isPlaying ? '3s' : '0s' }} 
           aria-hidden="true"
@@ -255,14 +261,14 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPl
       <audio ref={audioRef} loop={false} preload="metadata" aria-labelledby={`song-title-${song.id}`}></audio>
 
       <div
-        className={`absolute inset-0 top-0 left-0 w-full h-full bg-black bg-opacity-80 backdrop-blur-sm rounded-xl p-4 flex flex-col justify-between items-center text-center text-white transition-all duration-300 ease-in-out transform ${
+        className={`absolute inset-0 top-0 left-0 w-full h-full bg-black bg-opacity-80 backdrop-blur-sm rounded-xl p-4 flex flex-col justify-between items-center text-center text-white transition-all duration-300 ease-in-out motion-safe:transform motion-reduce:transition-none ${
           isPanelVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'
         }`}
         aria-hidden={!isPanelVisible}
       >
-        <div className="w-full pt-2"> 
-          <h4 className="text-lg sm:text-xl font-bold truncate mb-0.5">{song.title}</h4>
-          <p className="text-xs sm:text-sm text-neutral-300 mb-2">{displayArtist}</p>
+        <div className="w-full pt-2 overflow-hidden"> {/* Added overflow-hidden for text animations */}
+          <h4 className={`text-lg sm:text-xl font-bold truncate mb-0.5 transition-all duration-300 ease-out motion-safe:transform motion-reduce:transition-none ${isPanelVisible ? 'opacity-100 translate-y-0 delay-150' : 'opacity-0 -translate-y-3'}`}>{song.title}</h4>
+          <p className={`text-xs sm:text-sm text-neutral-300 mb-2 transition-all duration-300 ease-out motion-safe:transform motion-reduce:transition-none ${isPanelVisible ? 'opacity-100 translate-y-0 delay-200' : 'opacity-0 translate-y-3'}`}>{displayArtist}</p>
         </div>
         
         <div className="flex-grow w-full min-h-[4rem] sm:min-h-[5rem] md:min-h-[6rem]"></div> 

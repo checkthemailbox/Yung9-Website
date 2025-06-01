@@ -6,17 +6,21 @@
   <title>Yung9 WEBSITE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    html, body {
+      overflow-x: hidden; /* Prevent horizontal scrolling */
+    }
     body {
-      font-family: 'Poppins', sans-serif; /* Updated default font */
-      scroll-behavior: smooth; /* Added for smooth lyric scrolling */
-      background-color: #0A1A0A; /* Base dark green */
+      font-family: 'Poppins', sans-serif; 
+      scroll-behavior: smooth; 
+      background-color: #0A1A0A; 
       background-image: radial-gradient(ellipse at center, #143814 0%, #0A1A0A 70%);
-      background-attachment: fixed; /* Ensure gradient covers viewport and doesn't scroll */
-      background-size: cover; /* Ensure gradient covers viewport */
-      color: #e0e0e0; /* Default text color for better contrast on dark green */
+      background-attachment: fixed; 
+      background-size: cover; 
+      color: #e0e0e0; 
+      transition: background-image 0.5s ease-in-out, color 0.5s ease-in-out;
     }
      /* Custom scrollbar for elements with .styled-scrollbar */
     .styled-scrollbar::-webkit-scrollbar {
@@ -24,18 +28,17 @@
       height: 6px;
     }
     .styled-scrollbar::-webkit-scrollbar-track {
-      background: rgba(50, 50, 50, 0.3); /* Semi-transparent track */
+      background: rgba(50, 50, 50, 0.3); 
       border-radius: 3px;
     }
     .styled-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(120, 120, 120, 0.7); /* Semi-transparent thumb */
+      background: rgba(120, 120, 120, 0.7); 
       border-radius: 3px;
     }
     .styled-scrollbar::-webkit-scrollbar-thumb:hover {
       background: rgba(150, 150, 150, 0.9);
     }
 
-    /* Fallback for general scrollbar if needed, or remove if .styled-scrollbar is sufficient */
     ::-webkit-scrollbar {
       width: 8px;
     }
@@ -50,16 +53,258 @@
       background: #6a6a6a;
     }
 
-    /* Canvas Mouse Trail Style */
     #mouse-trail-canvas {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      pointer-events: none; /* Important: canvas should not intercept mouse events */
-      z-index: 9999; /* Ensure it's on top */
+      pointer-events: none; 
+      z-index: 9999; 
     }
+
+    @keyframes pulse-glow-yellow {
+      0%, 100% {
+        text-shadow: 0 0 6px rgba(250, 204, 21, 0.6), 0 0 10px rgba(250, 204, 21, 0.3);
+      }
+      50% {
+        text-shadow: 0 0 10px rgba(250, 204, 21, 0.8), 0 0 20px rgba(250, 204, 21, 0.5);
+      }
+    }
+    .animate-pulse-glow-yellow {
+      animation: pulse-glow-yellow 2.5s infinite ease-in-out;
+    }
+    
+    @keyframes pulse-glow-green {
+      0%, 100% {
+        text-shadow: 0 0 8px rgba(74, 222, 128, 0.6), 0 0 12px rgba(74, 222, 128, 0.3);
+      }
+      50% {
+        text-shadow: 0 0 12px rgba(74, 222, 128, 0.8), 0 0 24px rgba(74, 222, 128, 0.5);
+      }
+    }
+    .animate-pulse-glow-green {
+      animation: pulse-glow-green 2.5s infinite ease-in-out;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%) skewX(-15deg); }
+      100% { transform: translateX(100%) skewX(-15deg); }
+    }
+    .btn-shimmer {
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-shimmer::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 20%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.05) 80%, rgba(255,255,255,0) 100%);
+      transform: translateX(-100%) skewX(-15deg);
+      transition: transform 0.5s ease;
+      pointer-events: none;
+    }
+    .btn-shimmer:hover::after {
+      animation: shimmer 1s ease-in-out;
+      animation-iteration-count: 1; 
+    }
+    
+    @keyframes subtle-pulse-shadow {
+      0%, 100% {
+        box-shadow: 0 0 10px 2px rgba(220,38,38,0.6);
+      }
+      50% {
+        box-shadow: 0 0 15px 5px rgba(220,38,38,0.8);
+      }
+    }
+    .animate-subtle-pulse-shadow {
+       animation: subtle-pulse-shadow 2.5s infinite ease-in-out;
+    }
+
+    /* Normal Mode Header Title Style */
+    header:not(.header-vault-mode) h1 {
+      /* Tailwind 'text-green-300' on spans will set color: #86efac */
+      text-shadow: 0 0 8px rgba(134, 239, 172, 0.7); /* Corresponds to green-300 */
+    }
+    header:not(.header-vault-mode) p {
+      color: #e0e0e0; /* Ensure subtitle remains whitish in normal mode */
+    }
+
+
+    /* Vault Mode Active Styles */
+    body.vault-mode-active {
+      background-color: #100505; /* Dark red base */
+      background-image: radial-gradient(ellipse at center, #400a0a 0%, #100505 70%);
+      color: #f5c5c5; /* Light reddish text */
+    }
+
+    body.vault-mode-active .header-vault-mode {
+      background: linear-gradient(to right, #500a0a, #300505, #500a0a);
+    }
+    body.vault-mode-active .header-vault-mode h1 {
+      color: #ef4444 !important; /* Red-500, !important to override span color */
+      text-shadow: 0 0 8px rgba(255, 50, 50, 0.7);
+    }
+    body.vault-mode-active .header-vault-mode p {
+      color: #fca5a5; /* Red-300 */
+      text-shadow:0 0 5px rgba(255, 50, 50, 0.5);
+    }
+    
+    body.vault-mode-active .countdown-timer-vault-mode {
+       background: linear-gradient(to right, #280505, #180303, #280505);
+    }
+    
+    body.vault-mode-active .animate-pulse-glow-green-vault {
+       animation: pulse-glow-red 2.5s infinite ease-in-out !important;
+    }
+
+    @keyframes pulse-glow-red {
+      0%, 100% {
+        text-shadow: 0 0 8px rgba(239, 68, 68, 0.7), 0 0 12px rgba(239, 68, 68, 0.4);
+      }
+      50% {
+        text-shadow: 0 0 12px rgba(239, 68, 68, 0.9), 0 0 24px rgba(239, 68, 68, 0.6);
+      }
+    }
+    
+    body.vault-mode-active .animate-pulse-glow-yellow {
+      animation: pulse-glow-orange 2.5s infinite ease-in-out !important;
+    }
+    @keyframes pulse-glow-orange {
+      0%, 100% {
+        text-shadow: 0 0 6px rgba(251, 146, 60, 0.7), 0 0 10px rgba(251, 146, 60, 0.4);
+      }
+      50% {
+        text-shadow: 0 0 10px rgba(251, 146, 60, 0.9), 0 0 20px rgba(251, 146, 60, 0.6);
+      }
+    }
+    
+    body.vault-mode-active .vault-content h2 {
+        color: #ef4444; /* Red-500 */
+        text-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+    }
+    body.vault-mode-active .vault-content p {
+        color: #fca5a5; /* Red-300 */
+    }
+
+    /* Vault Welcome Notification */
+    .vault-welcome-notification {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(20, 0, 0, 0.9);
+      color: #ff6b6b; /* Light, fiery red */
+      padding: 25px 40px;
+      border-radius: 12px;
+      border: 2px solid #ff6b6b;
+      box-shadow: 0 0 30px 10px rgba(255, 50, 50, 0.5);
+      font-size: 2.5rem;
+      font-weight: 900; /* Poppins Black */
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      z-index: 10000;
+      opacity: 0;
+      animation: fadeInOutVaultWelcome 3s ease-in-out forwards;
+      text-shadow: 0 0 10px #ff6b6b, 0 0 20px #ff4757;
+    }
+
+    @keyframes fadeInOutVaultWelcome {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+      80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    }
+
+    /* Section Reveal Animation with Blur */
+    .section-base-styles {
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(4px);
+    }
+
+    @keyframes section-reveal-blur {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+        filter: blur(4px);
+      }
+      60% { /* Faster opacity and transform, slower blur resolve */
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0.5px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0px);
+      }
+    }
+
+    .section-animate-in {
+      animation-name: section-reveal-blur;
+      animation-duration: 1s; /* Duration of the animation */
+      animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Custom easing */
+      animation-fill-mode: forwards; /* Retain styles from the last keyframe */
+    }
+    
+    /* Scroll Motion Blur Effect */
+    .countdown-timer-blur-target,
+    .main-content-blur-target,
+    .footer-blur-target {
+        transition: filter 0.08s linear;
+        filter: none; /* Default state: no blur */
+    }
+
+    .page-container.scrolling .countdown-timer-blur-target,
+    .page-container.scrolling .main-content-blur-target,
+    .page-container.scrolling .footer-blur-target {
+        filter: blur(1px);
+    }
+
+
+    @media (prefers-reduced-motion: reduce) {
+      .animate-pulse-glow-yellow,
+      .animate-pulse-glow-green,
+      .btn-shimmer::after,
+      .animate-subtle-pulse-shadow,
+      body.vault-mode-active .animate-pulse-glow-red,
+      body.vault-mode-active .animate-pulse-glow-orange,
+      .vault-welcome-notification,
+      .section-animate-in { /* Target the animation directly */
+        animation: none !important;
+        transition: none !important;
+      }
+      .btn-shimmer:hover::after {
+        transform: translateX(-100%) skewX(-15deg); 
+      }
+      .vault-welcome-notification { 
+        opacity: 1; 
+      }
+      /* Ensure sections are visible if animations are off */
+      .section-base-styles.section-animate-in,
+      .section-base-styles { 
+        opacity: 1;
+        transform: translateY(0);
+        filter: none;
+      }
+
+      /* Disable scroll motion blur for reduced motion */
+      .page-container.scrolling .countdown-timer-blur-target,
+      .page-container.scrolling .main-content-blur-target,
+      .page-container.scrolling .footer-blur-target {
+          filter: none !important;
+      }
+      .countdown-timer-blur-target,
+      .main-content-blur-target,
+      .footer-blur-target {
+          transition: none !important;
+      }
+    }
+
   </style>
 <script type="importmap">
 {
