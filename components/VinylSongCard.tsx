@@ -27,6 +27,20 @@ const Forward5sIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6"
   </svg>
 );
 
+const VolumeCtrlIcon: React.FC<{ volume: number; className?: string }> = ({ volume, className = "w-5 h-5" }) => (
+  volume === 0 ? (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.348 2.595.341 1.24 1.518 1.905 2.66 1.905H6.44l4.5 4.5c.945.945 2.561.276 2.56-1.06V4.06zm4.28 9.22a.75.75 0 10-1.06-1.06L15.664 11.16a.75.75 0 00-1.06 1.06l1.056 1.056-1.056 1.056a.75.75 0 001.06 1.06l1.056-1.056 1.056 1.056a.75.75 0 001.06-1.06L17.78 13.276l1.056-1.056z"/>
+    </svg>
+  ) : (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.348 2.595.341 1.24 1.518 1.905 2.66 1.905H6.44l4.5 4.5c.945.945 2.561.276 2.56-1.06V4.06zM18.584 14.828a1.5 1.5 0 000-2.121L16.463 10.59a1.5 1.5 0 00-2.121 2.121l2.121 2.121a1.5 1.5 0 002.121 0z" />
+      <path d="M17.109 12a5.072 5.072 0 01-1.714 3.781 1.5 1.5 0 102.121 2.121A8.073 8.073 0 0019.929 12a8.072 8.072 0 00-2.412-5.902 1.5 1.5 0 00-2.121 2.121A5.072 5.072 0 0117.109 12z" />
+    </svg>
+  )
+);
+
+
 const formatTime = (timeInSeconds: number): string => {
   if (isNaN(timeInSeconds) || timeInSeconds < 0) return '00:00';
   const minutes = Math.floor(timeInSeconds / 60);
@@ -45,9 +59,18 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPl
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [localVolume, setLocalVolume] = useState<number>(0.75); 
   
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
+
+  // Effect to update audio element's volume when localVolume state changes
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = localVolume;
+    }
+  }, [localVolume]);
 
   const handleAudioPlay = useCallback(() => {
     setIsPlaying(true);
@@ -90,10 +113,12 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPl
     const handleLoadedMetadata = () => {
         if (audio.duration !== Infinity && audio.duration > 0) {
              setDuration(audio.duration);
+             audio.volume = localVolume; 
         } else {
              setTimeout(() => {
                  if (audio.duration !== Infinity && audio.duration > 0) {
                      setDuration(audio.duration);
+                     audio.volume = localVolume; 
                  }
              }, 500); 
         }
@@ -105,13 +130,19 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPl
       }
     };
 
+    const handleCanPlay = () => { 
+      audio.volume = localVolume;
+    };
+
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', onTimeUpdateInternal);
     audio.addEventListener('play', handleAudioPlay);
     audio.addEventListener('pause', handleAudioPause);
     audio.addEventListener('ended', handleAudioEnded);
     audio.addEventListener('error', handleAudioError);
+    audio.addEventListener('canplay', handleCanPlay); 
     audio.preload = 'metadata';
+    audio.volume = localVolume; 
     
     setDuration(0); 
     setCurrentTime(0); 
@@ -132,11 +163,12 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPl
       audio.removeEventListener('pause', handleAudioPause);
       audio.removeEventListener('ended', handleAudioEnded);
       audio.removeEventListener('error', handleAudioError);
-      if (audio && !audio.paused) { 
-        audio.pause();
-      }
+      audio.removeEventListener('canplay', handleCanPlay); 
+      // if (audio && !audio.paused) { // This was commented out intentionally
+      //   audio.pause();
+      // }
     };
-  }, [song.audioSnippetUrl, song.title, handleAudioPlay, handleAudioPause, handleAudioEnded, handleAudioError]);
+  }, [song.audioSnippetUrl, song.title, handleAudioPlay, handleAudioPause, handleAudioEnded, handleAudioError]); // Removed localVolume from dependencies
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -217,7 +249,7 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPl
           transition-all duration-300 ease-out
           motion-safe:group-hover:scale-105 motion-safe:group-hover:shadow-xl motion-safe:group-hover:-translate-y-1
           motion-reduce:group-hover:transform-none
-          ${isPanelVisible ? 'opacity-70 motion-safe:group-hover:blur-[2px]' : 'opacity-100'}
+          ${isPanelVisible ? 'opacity-70' : 'opacity-100'}
         `}
       >
         <img
@@ -266,12 +298,12 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPl
         }`}
         aria-hidden={!isPanelVisible}
       >
-        <div className="w-full pt-2 overflow-hidden"> {/* Added overflow-hidden for text animations */}
+        <div className="w-full pt-2 overflow-hidden"> 
           <h4 className={`text-lg sm:text-xl font-bold truncate mb-0.5 transition-all duration-300 ease-out motion-safe:transform motion-reduce:transition-none ${isPanelVisible ? 'opacity-100 translate-y-0 delay-150' : 'opacity-0 -translate-y-3'}`}>{song.title}</h4>
           <p className={`text-xs sm:text-sm text-neutral-300 mb-2 transition-all duration-300 ease-out motion-safe:transform motion-reduce:transition-none ${isPanelVisible ? 'opacity-100 translate-y-0 delay-200' : 'opacity-0 translate-y-3'}`}>{displayArtist}</p>
         </div>
         
-        <div className="flex-grow w-full min-h-[4rem] sm:min-h-[5rem] md:min-h-[6rem]"></div> 
+        <div className="flex-grow w-full min-h-[2.5rem] sm:min-h-[3rem] md:min-h-[4rem]"></div> 
         
         <div className="w-full mb-2">
           <div
@@ -300,6 +332,30 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPl
           </div>
         </div>
 
+        {/* Volume Control Section */}
+        <div 
+            className={`flex items-center w-full space-x-2 mb-3 px-1 transition-opacity duration-300 ease-out motion-safe:transform motion-reduce:transition-none ${
+                isPanelVisible ? 'opacity-100 translate-y-0 delay-250' : 'opacity-0 translate-y-3'
+            }`}
+        >
+            <VolumeCtrlIcon volume={localVolume} className="text-neutral-400 hover:text-purple-300 w-5 h-5 flex-shrink-0" />
+            <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={localVolume}
+                onChange={(e) => setLocalVolume(parseFloat(e.target.value))}
+                className="w-full h-2 bg-neutral-600 rounded-lg appearance-none cursor-pointer accent-purple-500 hover:accent-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400 focus:ring-opacity-75"
+                aria-label={`Volume for ${song.title}`}
+                aria-valuemin={0}
+                aria-valuemax={1}
+                aria-valuenow={localVolume}
+                aria-valuetext={`${Math.round(localVolume * 100)}%`}
+                tabIndex={isPanelVisible ? 0 : -1}
+            />
+        </div>
+
         <div className="flex items-center justify-around w-full space-x-3 pb-2">
           <button 
             onClick={() => seek(-5)} 
@@ -312,7 +368,7 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPl
           <button 
             onClick={togglePlayPause} 
             className="p-2 bg-purple-600 hover:bg-purple-500 rounded-full text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black/80 focus:ring-purple-400" 
-            aria-label={isPlaying ? 'Pause' : 'Play'}
+            aria-label={isPlaying ? `Pause ${song.title}` : `Play ${song.title}`}
             tabIndex={isPanelVisible ? 0 : -1}
           >
             {isPlaying ? <PauseIcon className="w-6 h-6 sm:w-7 sm:h-7" /> : <PlayIcon className="w-6 h-6 sm:w-7 sm:h-7" />}

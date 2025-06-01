@@ -9,10 +9,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    html, body {
+    html {
+      height: 100%; /* Ensure html takes full viewport height */
+      overflow-y: auto; /* Make html the primary vertical scroller */
       overflow-x: hidden; /* Prevent horizontal scrolling */
     }
     body {
+      min-height: 100%; /* Allow body to fill html height and grow */
+      overflow-x: hidden; /* Redundant if html has it, but safe */
       font-family: 'Poppins', sans-serif; 
       scroll-behavior: smooth; 
       background-color: #0A1A0A; 
@@ -21,7 +25,15 @@
       background-size: cover; 
       color: #e0e0e0; 
       transition: background-image 0.5s ease-in-out, color 0.5s ease-in-out;
+      display: flex; /* Ensure body can be a proper flex container for #root */
+      flex-direction: column; /* Align #root vertically */
     }
+    #root {
+      flex-grow: 1; /* Allow #root to take up available space in body */
+      display: flex; /* Allow App's main container to fill #root if needed */
+      flex-direction: column; /* Align App's main container vertically */
+    }
+
      /* Custom scrollbar for elements with .styled-scrollbar */
     .styled-scrollbar::-webkit-scrollbar {
       width: 6px;
@@ -39,17 +51,18 @@
       background: rgba(150, 150, 150, 0.9);
     }
 
-    ::-webkit-scrollbar {
+    /* Styles for the main scrollbar (now on <html>) */
+    html::-webkit-scrollbar {
       width: 8px;
     }
-    ::-webkit-scrollbar-track {
+    html::-webkit-scrollbar-track {
       background: #1a1a1a; 
     }
-    ::-webkit-scrollbar-thumb {
+    html::-webkit-scrollbar-thumb {
       background: #4a4a4a; 
       border-radius: 4px;
     }
-    ::-webkit-scrollbar-thumb:hover {
+    html::-webkit-scrollbar-thumb:hover {
       background: #6a6a6a;
     }
 
@@ -87,6 +100,31 @@
       animation: pulse-glow-green 2.5s infinite ease-in-out;
     }
 
+    @keyframes pulse-glow-blue {
+      0%, 100% {
+        text-shadow: 0 0 6px rgba(96, 165, 250, 0.6), 0 0 10px rgba(96, 165, 250, 0.3);
+      }
+      50% {
+        text-shadow: 0 0 10px rgba(96, 165, 250, 0.8), 0 0 20px rgba(96, 165, 250, 0.5);
+      }
+    }
+    .animate-pulse-glow-blue {
+      animation: pulse-glow-blue 2.5s infinite ease-in-out;
+    }
+
+    @keyframes float-subtle {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-3px);
+      }
+    }
+    .animate-float-subtle {
+      animation: float-subtle 3s infinite ease-in-out;
+    }
+
+    /* Shimmer for Buttons */
     @keyframes shimmer {
       0% { transform: translateX(-100%) skewX(-15deg); }
       100% { transform: translateX(100%) skewX(-15deg); }
@@ -111,7 +149,38 @@
       animation: shimmer 1s ease-in-out;
       animation-iteration-count: 1; 
     }
+
+    /* Shine for Text on Hover - using background-clip: text */
+    .text-shimmer-on-hover {
+      position: relative;
+      display: inline-block; 
+
+      color: transparent !important; /* Crucial for background-clip: text to work */
+      -webkit-background-clip: text;
+      background-clip: text;
+      
+      /* Gradient includes base color (blue-400: #60a5fa) and shine (semi-transparent white) */
+      background-image: linear-gradient(
+        90deg, 
+        #60a5fa 0%,      /* Base color */
+        #60a5fa 40%,     /* Base color */
+        rgba(255, 255, 255, 0.7) 48%, /* Shine start */
+        rgba(255, 255, 255, 0.7) 52%, /* Shine end */
+        #60a5fa 60%,     /* Base color */
+        #60a5fa 100%     /* Base color */
+      );
+      background-size: 250% 100%; /* Gradient is wider than element for sweep effect */
+      background-position: 100% 0; /* Initial: shows rightmost (all blue) part of gradient */
+      
+      transition: background-position 0.75s ease-in-out;
+    }
+
+    .text-shimmer-on-hover:hover {
+      background-position: 0% 0; /* On hover: sweep to show leftmost part, moving shine across */
+    }
     
+    /* Removed old ::after based shimmer and text-shine-animation keyframes */
+
     @keyframes subtle-pulse-shadow {
       0%, 100% {
         box-shadow: 0 0 10px 2px rgba(220,38,38,0.6);
@@ -170,7 +239,12 @@
       }
     }
     
-    body.vault-mode-active .animate-pulse-glow-yellow {
+    body.vault-mode-active .animate-pulse-glow-yellow { 
+      animation: pulse-glow-orange 2.5s infinite ease-in-out !important;
+    }
+    body.vault-mode-active .animate-pulse-glow-blue { 
+      /* If .text-shimmer-on-hover is also used for vault mode blue, this might need adjustment or the shimmer itself needs vault variant */
+      /* For now, assuming .text-shimmer-on-hover's blue is overridden by vault-mode-active styles if needed, or that it's not used on blue text in vault */
       animation: pulse-glow-orange 2.5s infinite ease-in-out !important;
     }
     @keyframes pulse-glow-orange {
@@ -197,13 +271,13 @@
       left: 50%;
       transform: translate(-50%, -50%);
       background-color: rgba(20, 0, 0, 0.9);
-      color: #ff6b6b; /* Light, fiery red */
+      color: #ff6b6b; 
       padding: 25px 40px;
       border-radius: 12px;
       border: 2px solid #ff6b6b;
       box-shadow: 0 0 30px 10px rgba(255, 50, 50, 0.5);
       font-size: 2.5rem;
-      font-weight: 900; /* Poppins Black */
+      font-weight: 900; 
       text-transform: uppercase;
       letter-spacing: 2px;
       z-index: 10000;
@@ -232,7 +306,7 @@
         transform: translateY(20px);
         filter: blur(4px);
       }
-      60% { /* Faster opacity and transform, slower blur resolve */
+      60% { 
         opacity: 1;
         transform: translateY(0);
         filter: blur(0.5px);
@@ -246,62 +320,59 @@
 
     .section-animate-in {
       animation-name: section-reveal-blur;
-      animation-duration: 1s; /* Duration of the animation */
-      animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Custom easing */
-      animation-fill-mode: forwards; /* Retain styles from the last keyframe */
+      animation-duration: 1s; 
+      animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+      animation-fill-mode: forwards; 
     }
     
-    /* Scroll Motion Blur Effect */
     .countdown-timer-blur-target,
     .main-content-blur-target,
     .footer-blur-target {
-        transition: filter 0.08s linear;
-        filter: none; /* Default state: no blur */
+        filter: none; 
     }
-
-    .page-container.scrolling .countdown-timer-blur-target,
-    .page-container.scrolling .main-content-blur-target,
-    .page-container.scrolling .footer-blur-target {
-        filter: blur(1px);
-    }
-
 
     @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto; 
+      }
       .animate-pulse-glow-yellow,
       .animate-pulse-glow-green,
+      .animate-pulse-glow-blue, 
+      .animate-float-subtle, 
       .btn-shimmer::after,
       .animate-subtle-pulse-shadow,
       body.vault-mode-active .animate-pulse-glow-red,
       body.vault-mode-active .animate-pulse-glow-orange,
       .vault-welcome-notification,
-      .section-animate-in { /* Target the animation directly */
+      .section-animate-in { 
         animation: none !important;
         transition: none !important;
       }
       .btn-shimmer:hover::after {
         transform: translateX(-100%) skewX(-15deg); 
       }
+      .text-shimmer-on-hover { /* Disable text shimmer transition */
+        transition: none !important;
+      }
+      .text-shimmer-on-hover:hover { /* Keep initial state on hover for reduced motion */
+         background-position: 100% 0; 
+      }
       .vault-welcome-notification { 
         opacity: 1; 
       }
-      /* Ensure sections are visible if animations are off */
       .section-base-styles.section-animate-in,
       .section-base-styles { 
         opacity: 1;
         transform: translateY(0);
         filter: none;
       }
-
-      /* Disable scroll motion blur for reduced motion */
-      .page-container.scrolling .countdown-timer-blur-target,
-      .page-container.scrolling .main-content-blur-target,
-      .page-container.scrolling .footer-blur-target {
-          filter: none !important;
-      }
       .countdown-timer-blur-target,
       .main-content-blur-target,
       .footer-blur-target {
           transition: none !important;
+      }
+      .animate-float-subtle { 
+        transform: translateY(0);
       }
     }
 

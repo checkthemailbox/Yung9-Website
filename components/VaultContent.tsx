@@ -7,6 +7,7 @@ interface VaultContentProps {
   song: Song;
   playingSongId: string | null;
   onSongPlay: (songId: string) => void;
+  // globalVolume: number; // Removed
 }
 
 const VaultContent: React.FC<VaultContentProps> = ({ song, playingSongId, onSongPlay }) => {
@@ -21,6 +22,7 @@ const VaultContent: React.FC<VaultContentProps> = ({ song, playingSongId, onSong
             song={song} 
             onPlay={onSongPlay}
             currentlyPlayingId={playingSongId}
+            // globalVolume={globalVolume} // Removed
           />
         </div>
       </div>

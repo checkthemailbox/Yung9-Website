@@ -3,6 +3,7 @@ import React from 'react';
 
 interface HeaderProps {
   onVaultClick: () => void;
+  onFeaturesClick: () => void;
   vaultButtonText: string;
   isVaultOpen: boolean; 
   isVaultUnlocked: boolean;
@@ -12,6 +13,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ 
   onVaultClick, 
+  onFeaturesClick,
   vaultButtonText, 
   isVaultOpen, 
   isVaultUnlocked,
@@ -32,6 +34,10 @@ const Header: React.FC<HeaderProps> = ({
       ? 'bg-neutral-700 hover:bg-neutral-600 focus:ring-neutral-500 text-white' 
       : 'bg-red-500 hover:bg-red-600 focus:ring-red-400 text-white shadow-[0_0_8px_1px_rgba(239,68,68,0.5)] hover:shadow-[0_0_12px_3px_rgba(239,68,68,0.7)]';
   }
+
+  const featuresButtonDynamicClass = isVaultModeActive
+    ? 'bg-neutral-600 hover:bg-neutral-500 focus:ring-neutral-400 text-white'
+    : 'bg-sky-500 hover:bg-sky-600 focus:ring-sky-400 text-white';
 
   const mainTitleColorClass = isVaultModeActive ? '' : 'text-green-300';
 
@@ -61,7 +67,7 @@ const Header: React.FC<HeaderProps> = ({
         <p className="mt-2 sm:mt-3 text-lg sm:text-xl"> {/* Color controlled by body's text color or parent's vault-mode class */}
           Song Showcase
         </p>
-        <div className="mt-6">
+        <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-center gap-3 sm:gap-4">
           <button
             onClick={onVaultClick}
             aria-label={vaultButtonText}
@@ -72,6 +78,17 @@ const Header: React.FC<HeaderProps> = ({
             `}
           >
             {vaultButtonText}
+          </button>
+          <button
+            onClick={onFeaturesClick}
+            aria-label="View Features - Work in progress"
+            className={`
+              px-6 py-3 rounded-lg font-semibold transition-all duration-300 ease-in-out
+              focus:outline-none focus:ring-4 focus:ring-opacity-50
+              ${featuresButtonDynamicClass}
+            `}
+          >
+            Features
           </button>
         </div>
       </div>
