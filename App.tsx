@@ -47,9 +47,10 @@ const songsData: Song[] = [
   },
   {
     id: '5', 
-    title: 'GIMME DA CART',
+    title: 'GIMME DA CART (feat. Tyler Alexander)',
     artist: 'Yung9',
-    albumArtUrl: 'https://res.cloudinary.com/dxpexhv42/image/upload/v1748730591/400x400_afkvik.jpg', 
+    featuredArtist: 'Tyler Alexander',
+    albumArtUrl: 'https://res.cloudinary.com/dxpexhv42/image/upload/v1748817635/gimmecart_kwg3fg.jpg', 
     audioSnippetUrl: 'https://res.cloudinary.com/dxpexhv42/video/upload/v1748812659/GIMME_DA_CART_MIXED_FINAL_1_jy88la.mp3', 
   },
 ];
