@@ -9,6 +9,7 @@
     "esbuild": "^0.21.0"
   },
   "dependencies": {
-    "react-helmet": "^6.1.0"
+    "react-helmet": "^6.1.0",
+    "sass": "^1.89.1"
   }
 }
