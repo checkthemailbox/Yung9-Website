@@ -1,14 +1,14 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { Song } from './types';
-import Header from './components/Header';
-import VinylSongCard from './components/VinylSongCard';
-import VaultModal from './components/VaultModal';
-import VaultContent from './components/VaultContent';
-import MouseTrail from './components/MouseTrail';
-import MouseTrailToggle from './components/MouseTrailToggle';
-import CountdownTimer from './components/CountdownTimer';
-import useIsMobile from './hooks/useIsMobile'; // Import the new hook
+import { Song } from './types.ts';
+import Header from './components/Header.tsx';
+import VinylSongCard from './components/VinylSongCard.tsx';
+import VaultModal from './components/VaultModal.tsx';
+import VaultContent from './components/VaultContent.tsx';
+import MouseTrail from './components/MouseTrail.tsx';
+import MouseTrailToggle from './components/MouseTrailToggle.tsx';
+import CountdownTimer from './components/CountdownTimer.tsx';
+import useIsMobile from './hooks/useIsMobile.ts'; // Import the new hook
 
 const songsData: Song[] = [
   {
