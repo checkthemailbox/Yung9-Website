@@ -12,6 +12,11 @@
     body {
       font-family: 'Poppins', sans-serif; /* Updated default font */
       scroll-behavior: smooth; /* Added for smooth lyric scrolling */
+      background-color: #0A1A0A; /* Base dark green */
+      background-image: radial-gradient(ellipse at center, #143814 0%, #0A1A0A 70%);
+      background-attachment: fixed; /* Ensure gradient covers viewport and doesn't scroll */
+      background-size: cover; /* Ensure gradient covers viewport */
+      color: #e0e0e0; /* Default text color for better contrast on dark green */
     }
      /* Custom scrollbar for elements with .styled-scrollbar */
     .styled-scrollbar::-webkit-scrollbar {
@@ -44,6 +49,17 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #6a6a6a;
     }
+
+    /* Canvas Mouse Trail Style */
+    #mouse-trail-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none; /* Important: canvas should not intercept mouse events */
+      z-index: 9999; /* Ensure it's on top */
+    }
   </style>
 <script type="importmap">
 {
@@ -56,7 +72,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-<body class="bg-neutral-950">
+<body>
   <div id="root"></div>
   <script type="module" src="/index.js"></script>
 <script type="module" src="/index.tsx"></script>
