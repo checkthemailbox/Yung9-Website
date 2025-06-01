@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Song } from '../types';
+import { Song } from '../types.ts';
 
 // SVG Icons for Controls
 const PlayIcon: React.FC<{ className?: string }> = ({ className = "w-7 h-7" }) => (
@@ -36,9 +36,11 @@ const formatTime = (timeInSeconds: number): string => {
 
 interface VinylSongCardProps {
   song: Song;
+  onPlay: (songId: string) => void;
+  currentlyPlayingId: string | null;
 }
 
-const VinylSongCard: React.FC<VinylSongCardProps> = ({ song }) => {
+const VinylSongCard: React.FC<VinylSongCardProps> = ({ song, onPlay, currentlyPlayingId }) => {
   const [isPanelVisible, setIsPanelVisible] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
@@ -46,6 +48,39 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song }) => {
   
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
+
+  const handleAudioPlay = useCallback(() => {
+    setIsPlaying(true);
+    onPlay(song.id);
+  }, [onPlay, song.id]);
+
+  const handleAudioPause = useCallback(() => {
+    setIsPlaying(false);
+  }, []);
+
+  const handleAudioEnded = useCallback(() => {
+    setIsPlaying(false);
+    const audio = audioRef.current;
+    if (audio && audio.duration && audio.duration !== Infinity) {
+      setCurrentTime(audio.duration);
+    }
+  }, []);
+  
+  const handleAudioError = useCallback((e: Event) => {
+    const mediaError = (e.target as HTMLAudioElement)?.error;
+    let errorMessage = 'Unknown audio error';
+    if (mediaError) {
+      switch (mediaError.code) {
+        case MediaError.MEDIA_ERR_ABORTED: errorMessage = 'Audio fetch aborted by user.'; break;
+        case MediaError.MEDIA_ERR_NETWORK: errorMessage = 'A network error caused the audio download to fail.'; break;
+        case MediaError.MEDIA_ERR_DECODE: errorMessage = 'Audio playback aborted due to a corruption problem or features not supported by browser.'; break;
+        case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: errorMessage = 'Audio source not supported. (Often a CORS issue or invalid URL)'; break;
+        default: errorMessage = `An unknown error occurred. Code: ${mediaError.code}`;
+      }
+    }
+    console.error(`[VinylSongCard - ${song.title}] Audio error: ${errorMessage}`, mediaError);
+    setIsPlaying(false);
+  }, [song.title]);
 
 
   useEffect(() => {
@@ -60,68 +95,57 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song }) => {
                  if (audio.duration !== Infinity && audio.duration > 0) {
                      setDuration(audio.duration);
                  }
-             }, 500);
+             }, 500); // Delay check for browsers that take time to report duration
         }
     }
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
-    const handleEnded = () => {
-      setIsPlaying(false);
-      setCurrentTime(audio.duration); 
-    };
-    const handleError = (e: Event) => {
-      const mediaError = (e.target as HTMLAudioElement)?.error;
-      let errorMessage = 'Unknown audio error';
-      if (mediaError) {
-        switch (mediaError.code) {
-          case MediaError.MEDIA_ERR_ABORTED: errorMessage = 'Audio fetch aborted by user.'; break;
-          case MediaError.MEDIA_ERR_NETWORK: errorMessage = 'A network error caused the audio download to fail.'; break;
-          case MediaError.MEDIA_ERR_DECODE: errorMessage = 'Audio playback aborted due to a corruption problem or features not supported by browser.'; break;
-          case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: errorMessage = 'Audio source not supported. (Often a CORS issue or invalid URL)'; break;
-          default: errorMessage = `An unknown error occurred. Code: ${mediaError.code}`;
-        }
-      }
-      console.error(`[VinylSongCard - ${song.title}] Audio error: ${errorMessage}`, mediaError);
-      setIsPlaying(false);
-    };
     
     const onTimeUpdateInternal = () => {
-      if (audio && !audio.paused) {
+      if (audio && !audio.paused) { // only update if playing
         setCurrentTime(audio.currentTime);
       }
     };
 
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', onTimeUpdateInternal);
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('pause', handlePause);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('error', handleError);
+    audio.addEventListener('play', handleAudioPlay);
+    audio.addEventListener('pause', handleAudioPause);
+    audio.addEventListener('ended', handleAudioEnded);
+    audio.addEventListener('error', handleAudioError);
     audio.preload = 'metadata';
     
-    setDuration(0);
-    setCurrentTime(0);
-    setIsPlaying(false);
+    setDuration(0); // Reset duration on src change
+    setCurrentTime(0); // Reset current time on src change
+    setIsPlaying(false); // Reset playing state on src change
    
+    // Ensure audio source is updated if it changes
     if (audio.currentSrc !== song.audioSnippetUrl || audio.src !== song.audioSnippetUrl) { 
         audio.src = song.audioSnippetUrl; 
-        audio.load(); 
-    } else if (audio.readyState === 0) { 
+        audio.load(); // Important: call load() after changing src
+    } else if (audio.readyState === 0) { // If src is same but not loaded (e.g. network error previously)
         audio.load();
     }
+
 
     return () => {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('timeupdate', onTimeUpdateInternal);
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('pause', handlePause);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('error', handleError);
-      if (audio && !audio.paused) {
+      audio.removeEventListener('play', handleAudioPlay);
+      audio.removeEventListener('pause', handleAudioPause);
+      audio.removeEventListener('ended', handleAudioEnded);
+      audio.removeEventListener('error', handleAudioError);
+      if (audio && !audio.paused) { // Cleanup: pause audio if component unmounts while playing
         audio.pause();
       }
     };
-  }, [song.audioSnippetUrl, song.title]);
+  }, [song.audioSnippetUrl, song.title, handleAudioPlay, handleAudioPause, handleAudioEnded, handleAudioError]);
+
+  // Effect to pause this card's audio if another card starts playing
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio && currentlyPlayingId && currentlyPlayingId !== song.id && !audio.paused) {
+      audio.pause();
+    }
+  }, [currentlyPlayingId, song.id]);
 
 
   const togglePlayPause = useCallback(() => {
@@ -131,7 +155,7 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song }) => {
     if (audio.paused) {
       audio.play().catch(error => {
         console.error(`[VinylSongCard - ${song.title}] Error playing audio:`, error);
-        setIsPlaying(false); 
+        // setIsPlaying(false); // Error handler and pause event will manage state
       });
     } else { 
       audio.pause();
@@ -228,7 +252,7 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song }) => {
         {displayArtist}
       </p>
       
-      <audio ref={audioRef} src={song.audioSnippetUrl} loop={false} preload="metadata" aria-labelledby={`song-title-${song.id}`}></audio>
+      <audio ref={audioRef} loop={false} preload="metadata" aria-labelledby={`song-title-${song.id}`}></audio>
 
       <div
         className={`absolute inset-0 top-0 left-0 w-full h-full bg-black bg-opacity-80 backdrop-blur-sm rounded-xl p-4 flex flex-col justify-between items-center text-center text-white transition-all duration-300 ease-in-out transform ${
@@ -241,7 +265,6 @@ const VinylSongCard: React.FC<VinylSongCardProps> = ({ song }) => {
           <p className="text-xs sm:text-sm text-neutral-300 mb-2">{displayArtist}</p>
         </div>
         
-        {/* Placeholder for Lyrics or other content */}
         <div className="flex-grow w-full min-h-[4rem] sm:min-h-[5rem] md:min-h-[6rem]"></div> 
         
         <div className="w-full mb-2">
