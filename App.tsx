@@ -53,6 +53,13 @@ const songsData: Song[] = [
     albumArtUrl: 'https://res.cloudinary.com/dxpexhv42/image/upload/v1748817635/gimmecart_kwg3fg.jpg', 
     audioSnippetUrl: 'https://res.cloudinary.com/dxpexhv42/video/upload/v1748812659/GIMME_DA_CART_MIXED_FINAL_1_jy88la.mp3', 
   },
+  { // New Sneak Peek song
+    id: '6',
+    title: 'TEMPO',
+    artist: 'Yung9',
+    albumArtUrl: 'https://res.cloudinary.com/dxpexhv42/image/upload/v1749241331/tuff_j1snr5.jpg',
+    audioSnippetUrl: 'https://res.cloudinary.com/dxpexhv42/video/upload/v1749241330/TEMPO_rhyzll.mp3',
+  },
 ];
 
 const vaultSongData: Song = {
@@ -66,7 +73,7 @@ const vaultSongData: Song = {
 const LOCAL_STORAGE_MOUSE_TRAIL_KEY = 'yung9_mouseTrailActive';
 const LOCAL_STORAGE_VAULT_UNLOCKED_KEY = 'yung9_vaultUnlocked';
 
-const SONGS_IN_MAIN_GRID = 4;
+const SONGS_IN_MAIN_GRID = 5; // Updated from 4 to 5
 
 const MOUSE_TRAIL_COLOR_DEFAULT = [144, 238, 144]; // Light Green
 const MOUSE_TRAIL_COLOR_VAULT = [255, 69, 0]; // Red-Orange
@@ -183,9 +190,6 @@ const App: React.FC = () => {
   
   const handleGoBackFromFeatures = useCallback(() => {
     setCurrentView('main');
-    // If vault was unlocked, re-evaluate if vault content should be shown
-    // This might be redundant if vault button handles its state correctly
-    // For now, simple return to main is okay. If user wants to re-enter vault, they click vault button.
   }, []);
 
 
@@ -259,7 +263,7 @@ const App: React.FC = () => {
               ) : (
                 <>
                   <main className="container mx-auto px-4 py-10 sm:py-16">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
                       {gridSongs.map((song, index) => (
                         <div
                           key={song.id}
@@ -284,8 +288,8 @@ const App: React.FC = () => {
                           }`}
                           style={{ transitionDelay: pageLoaded ? `${gridSongs.length * 100}ms` : '0ms' }}
                         >
-                          <h3 className="text-shimmer-on-hover text-2xl sm:text-3xl font-bold text-blue-400 mb-4 tracking-tight text-center motion-safe:animate-pulse-glow-blue motion-safe:animate-float-subtle motion-reduce:animate-none">
-                            NEW SONG RELEASED
+                          <h3 className="text-2xl sm:text-3xl font-bold text-yellow-400 mb-4 tracking-tight text-center motion-safe:animate-pulse-glow-yellow motion-safe:animate-float-subtle motion-reduce:animate-none">
+                            NEW SNEAK PEEK
                           </h3>
                           <VinylSongCard
                             key={centeredSong.id}
